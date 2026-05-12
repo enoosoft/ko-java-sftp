@@ -24,24 +24,24 @@ import java.nio.charset.StandardCharsets;
  *   - 관련 이슈: https://github.com/hierynomus/sshj/issues/277 (미해결)
  *
  * 두 가지 모드:
- *   1) 기본 모드            : 한글 파일명을 그대로 put() → UTF-8 로 wire 송출
- *   2) --ms949 wire trick   : MS949 바이트열을 ISO-8859-1 1:1 매핑 String 으로
- *                             만들어서 전달. 이론적으로 wire 에 그 바이트열이
- *                             그대로 흘러야 하나, Buffer 가 UTF-8 재인코딩하므로
- *                             0x80 이상은 부풀려져 실제로는 깨진다.
- *                             → SSHJ 표준 API 로는 MS949/EUC-KR 송출 불가능을
- *                                실측하는 용도.
+ *   1) 기본 모드           : 한글 파일명을 그대로 put() → UTF-8 로 wire 송출
+ *   2) --euckr wire trick  : EUC-KR 바이트열을 ISO-8859-1 1:1 매핑 String 으로
+ *                            만들어서 전달. 이론적으로 wire 에 그 바이트열이
+ *                            그대로 흘러야 하나, Buffer 가 UTF-8 재인코딩하므로
+ *                            0x80 이상은 부풀려져 실제로는 깨진다.
+ *                            → SSHJ 표준 API 로는 EUC-KR 송출 불가능을
+ *                               실측하는 용도.
  *
  * 사용법:
  *   mvn -q -DskipTests package
  *   java -jar target/sshj-test-1.0.0-jar-with-dependencies.jar \
- *        <host> <port> <user> <password> <remoteDir> [--ms949]
+ *        <host> <port> <user> <password> <remoteDir> [--euckr]
  */
 public class SshjKoreanUploadTest {
 
     public static void main(String[] args) throws Exception {
         if (args.length < 5) {
-            System.err.println("Usage: <host> <port> <user> <password> <remoteDir> [--ms949]");
+            System.err.println("Usage: <host> <port> <user> <password> <remoteDir> [--euckr]");
             System.exit(1);
         }
         String host = args[0];
@@ -49,30 +49,30 @@ public class SshjKoreanUploadTest {
         String user = args[2];
         String password = args[3];
         String remoteDir = args[4];
-        boolean ms949Trick = args.length >= 6 && "--ms949".equals(args[5]);
+        boolean euckrTrick = args.length >= 6 && "--euckr".equals(args[5]);
 
-        String koreanName = "[sshj-0.38.0" + (ms949Trick ? "-ms949trick" : "-utf8") + "]한글_가나다_"
+        String koreanName = "한_[sshj-0.38.0" + (euckrTrick ? "-euckrtrick" : "-utf8") + "]_"
                 + System.currentTimeMillis() + ".txt";
-        String wireName = ms949Trick
-                ? new String(koreanName.getBytes(Charset.forName("MS949")), StandardCharsets.ISO_8859_1)
+        String wireName = euckrTrick
+                ? new String(koreanName.getBytes(Charset.forName("EUC-KR")), StandardCharsets.ISO_8859_1)
                 : koreanName;
 
         String content = "안녕하세요. SSHJ 한글 인코딩 테스트입니다.\n"
-                + "mode: " + (ms949Trick ? "MS949 wire trick" : "UTF-8 default") + "\n";
+                + "mode: " + (euckrTrick ? "EUC-KR wire trick" : "UTF-8 default") + "\n";
 
         System.out.println("=== SSHJ SFTP Korean Upload Test ===");
         System.out.println("host        : " + host + ":" + port);
         System.out.println("user        : " + user);
         System.out.println("remoteDir   : " + remoteDir);
-        System.out.println("mode        : " + (ms949Trick ? "MS949 wire trick" : "UTF-8 (default)"));
+        System.out.println("mode        : " + (euckrTrick ? "EUC-KR wire trick" : "UTF-8 (default)"));
         System.out.println("korean name : " + koreanName);
         System.out.println("wire name   : " + wireName);
         System.out.println("file.encoding(JVM): " + System.getProperty("file.encoding"));
         System.out.println();
         System.out.println("[ref bytes] '" + koreanName + "' as UTF-8  = "
                 + toHex(koreanName.getBytes(StandardCharsets.UTF_8)));
-        System.out.println("[ref bytes] '" + koreanName + "' as MS949  = "
-                + toHex(koreanName.getBytes(Charset.forName("MS949"))));
+        System.out.println("[ref bytes] '" + koreanName + "' as EUC-KR = "
+                + toHex(koreanName.getBytes(Charset.forName("EUC-KR"))));
         System.out.println("[ref bytes] wireName.getBytes(UTF-8)      = "
                 + toHex(wireName.getBytes(StandardCharsets.UTF_8)) + "  ← SSHJ 실제 송출 바이트열");
         System.out.println();

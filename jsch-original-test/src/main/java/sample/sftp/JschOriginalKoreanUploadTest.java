@@ -34,7 +34,7 @@ public class JschOriginalKoreanUploadTest {
         String password = args[3];
         String remoteDir = args[4];
 
-        String remoteFilename = "[jcraft-jsch-0.1.55]한글_가나다_" + System.currentTimeMillis() + ".txt";
+        String remoteFilename = "한_[jcraft-jsch-0.1.55]_" + System.currentTimeMillis() + ".txt";
         String content = "원본 jcraft jsch (0.1.55) 로 업로드한 파일.\n"
                 + "이 라이브러리는 파일명 인코딩이 UTF-8 로 강제됨.\n";
 
@@ -47,8 +47,8 @@ public class JschOriginalKoreanUploadTest {
         System.out.println();
         System.out.println("[wire bytes] '" + remoteFilename + "' as UTF-8 (강제) = "
                 + toHex(remoteFilename.getBytes(StandardCharsets.UTF_8)));
-        System.out.println("[ref bytes]  '" + remoteFilename + "' as MS949        = "
-                + toHex(remoteFilename.getBytes("MS949")));
+        System.out.println("[ref bytes]  '" + remoteFilename + "' as EUC-KR       = "
+                + toHex(remoteFilename.getBytes("EUC-KR")));
         System.out.println();
 
         Session session = null;

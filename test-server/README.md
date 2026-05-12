@@ -36,13 +36,9 @@ docker exec sftp-iso8859 locale
 루트 프로젝트로 돌아가 `jsch-test` / `sshj-test` 를 실행:
 
 ```bash
-# mwiede/jsch + MS949
+# mwiede/jsch + EUC-KR (기본값)
 java -jar ../jsch-test/target/jsch-test-1.0.0-jar-with-dependencies.jar \
-     localhost 2222 sftpuser sftppass /home/sftpuser MS949
-
-# mwiede/jsch + EUC-KR
-java -jar ../jsch-test/target/jsch-test-1.0.0-jar-with-dependencies.jar \
-     localhost 2222 sftpuser sftppass /home/sftpuser EUC-KR
+     localhost 2222 sftpuser sftppass /home/sftpuser
 
 # mwiede/jsch + UTF-8 (대조군)
 java -jar ../jsch-test/target/jsch-test-1.0.0-jar-with-dependencies.jar \
@@ -61,7 +57,7 @@ java -jar ../sshj-test/target/sshj-test-1.0.0-jar-with-dependencies.jar \
 # ASCII 외 문자를 \M-… 로 가시화
 docker exec sftp-iso8859 bash -c 'ls -la /home/sftpuser | cat -v'
 
-# 파일명 raw 바이트열 hex 확인 (한글 1자가 MS949=2바이트, UTF-8=3바이트)
+# 파일명 raw 바이트열 hex 확인 (한글 1자가 EUC-KR=2바이트, UTF-8=3바이트)
 docker exec sftp-iso8859 bash -c 'ls /home/sftpuser | xxd'
 
 # 정확한 인코딩별 비교: 한 문자씩 hex 로 풀어 보기
@@ -69,8 +65,7 @@ docker exec sftp-iso8859 bash -c 'ls /home/sftpuser | od -c | head -20'
 ```
 
 기대 결과:
-- `MS949` 로 송출한 파일 → 한글 1자 = 2바이트 (예: `한` = `C7 D1`)
-- `EUC-KR` 로 송출한 파일 → 동일
+- `EUC-KR` 로 송출한 파일 → 한글 1자 = 2바이트 (예: `한` = `C7 D1`)
 - `UTF-8` 로 송출한 파일 → 한글 1자 = 3바이트 (예: `한` = `ED 95 9C`)
 - SSHJ → UTF-8 과 동일
 
