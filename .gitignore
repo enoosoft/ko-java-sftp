@@ -1,0 +1,17 @@
+# Maven build artifacts
+target/
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Rendered docs (preview only)
+README.html
+
+# Logs
+*.log

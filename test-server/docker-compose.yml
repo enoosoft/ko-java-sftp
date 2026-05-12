@@ -1,0 +1,13 @@
+services:
+  sftp-iso8859:
+    build: .
+    container_name: sftp-iso8859
+    ports:
+      - "2222:22"
+    restart: unless-stopped
+    # 컨테이너 내부 디버깅 편의를 위해 호스트에서 빠르게 들여다볼 수 있게 볼륨 노출
+    volumes:
+      - sftp-home:/home/sftpuser
+
+volumes:
+  sftp-home:
